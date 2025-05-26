@@ -27,6 +27,8 @@ public class GameManager : ManagerBase
 
     private float _time;
     private UserData _userData;
+    private int _saveCombo; // fever 모드 콤보 저장
+    
     private GameState gameState { get; set; } = GameState.None;
     private bool _saveHistoryDataJsonFile;
     
@@ -90,6 +92,20 @@ public class GameManager : ManagerBase
                     newState = GameState.GameOver;  // 게임 오버 상태로 전환
                 }
                 
+                // fever 모드 처리
+                if (CanFever())
+                {
+                    _saveCombo = _userData.currentCombo;
+                    if (!_gameSceneUI.IsFeverOn())
+                        _gameSceneUI.StartFever(LocalDataManager.instance.gameData.FeverTimeLimit);
+                }
+                
+                // fever 모드 Note 처리
+                if (_gameSceneUI.IsFeverOn())
+                {
+                    _noteGroupScript.ChangeNoteType(NoteType.RainbowApple);
+                }
+                
                 _time -= Time.deltaTime;    // 시간 경과 처리
                 _gameSceneUI.SetTime(_time); // 게임 UI에 남은 시간 표시
 
@@ -121,6 +137,14 @@ public class GameManager : ManagerBase
         return newState;
     }
 
+    private bool CanFever()
+    {
+        return (_userData.currentCombo > 0) &&
+               (LocalDataManager.instance.gameData.FeverCombo != 0) &&
+               (_userData.currentCombo % LocalDataManager.instance.gameData.FeverCombo == 0) &&
+               (_userData.currentCombo != _saveCombo);
+    }
+
     // 게임 종료 조건 검사
     private bool IsGameOver()
     {
@@ -145,6 +169,7 @@ public class GameManager : ManagerBase
         // 게임 초기화
         _time = LocalDataManager.instance.gameData.TimeLimit;
         _userData = new UserData();
+        _saveCombo = 0;
         
         // 노트 그룹 오브젝트 초기화
         StartCoroutine(WaitForNoteGroup());
@@ -183,6 +208,7 @@ public class GameManager : ManagerBase
 
     public void InputProcess(InputType inputType)
     {
+        bool isSuccess = false;
         // 게임 진행 중에만 입력 받도록 조건문 추가
         if (!IsGamePlaying())
         {
@@ -198,40 +224,48 @@ public class GameManager : ManagerBase
                 return;
             }
 
-            // 입력 처리
-            if (inputType == InputType.Catch)
+            switch (inputType)
             {
+                // 입력 처리
                 // Debug.Log("Have 버튼 클릭됨");
-                if (_noteGroupScript.GetNoteType(0) == NoteType.Apple)
-                {
+                case InputType.Catch when _noteGroupScript.GetNoteType(0) == NoteType.Apple:
                     _userData.totalScore += LocalDataManager.instance.gameData.PointApple;
                     _userData.currentCombo++;
-                }
-                else if (_noteGroupScript.GetNoteType(0) == NoteType.GoldApple)
-                {
+                    isSuccess = true;
+                    break;
+                case InputType.Catch when _noteGroupScript.GetNoteType(0) == NoteType.GoldApple:
                     _userData.totalScore += LocalDataManager.instance.gameData.PointGoldApple;
                     _userData.currentCombo++;
-                }
-                else
-                {
+                    isSuccess = true;
+                    break;
+                case InputType.Catch when _noteGroupScript.GetNoteType(0) == NoteType.RainbowApple:
+                    _userData.totalScore += LocalDataManager.instance.gameData.PointRainbowApple;
+                    isSuccess = true;
+                    break;
+                case InputType.Catch:
                     _userData.totalScore -= LocalDataManager.instance.gameData.PointRottenApple;
                     _userData.currentCombo = 0;
-                }
-            }
-            else if (inputType == InputType.Throw)
-            {
+                    _saveCombo = 0;
+                    isSuccess = false;
+                    break;
                 // Debug.Log("Throw 버튼 클릭됨");
-                if (_noteGroupScript.GetNoteType(0) != NoteType.RottenApple)
-                {
+                case InputType.Throw when _noteGroupScript.GetNoteType(0) == NoteType.RainbowApple:
+                    _userData.totalScore += LocalDataManager.instance.gameData.PointRainbowApple;
+                    isSuccess = true;
+                    break;
+                case InputType.Throw when _noteGroupScript.GetNoteType(0) != NoteType.RottenApple:
                     _userData.totalScore -= LocalDataManager.instance.gameData.PointRottenApple;
                     _userData.currentCombo = 0;
-                }
-                else
-                {
+                    _saveCombo = 0;
+                    isSuccess = false;
+                    break;
+                case InputType.Throw:
                     _userData.currentCombo++;
-                }
+                    isSuccess = true;
+                    break;
+                
             }
-            _noteGroupScript.NoteProcess();
+            _noteGroupScript.NoteProcess(inputType, isSuccess);
             _gameSceneUI.SetScore(_userData.totalScore);
             _gameSceneUI.SetCombo(_userData.currentCombo);
         }
@@ -239,6 +273,23 @@ public class GameManager : ManagerBase
         {
             Debug.LogError("Error: " + e.Message);
         }
+    }
+    
+    public void RestartGame()
+    {
+        Debug.Log("Restarting game...");
+        CleanUp();
+        gameState = GameState.None;
+    }
+
+    public void KeepGoing()
+    {
+        gameState = GameState.Ready;
+    }
+
+    public void PauseGame()
+    {
+        gameState = GameState.Pause;
     }
     #endregion
 
@@ -261,26 +312,4 @@ public class GameManager : ManagerBase
         }
     }
     #endregion
-
-    public void RestartGame()
-    {
-        Debug.Log("Restarting game...");
-        CleanUp();
-        gameState = GameState.None;
-    }
-
-    public void KeepGoing()
-    {
-        gameState = GameState.Ready;
-    }
-
-    public void PauseGame()
-    {
-        gameState = GameState.Pause;
-    }
-
-    // public void RunTime()
-    // {
-    //     _time = _pauseTime;
-    // }
 }

@@ -111,6 +111,18 @@ public class LocalDataManager : ManagerBase
             Debug.LogError("TimeLimit 값이 유효하지 않습니다: " + gameData.TimeLimit);
             return null;
         }
+        
+        if (gameData.FeverTimeLimit <= 0)
+        {
+            Debug.LogError("FeverTimeLimit 값이 유효하지 않습니다: " + gameData.FeverTimeLimit);
+            return null;
+        }
+        
+        if (gameData.FeverCombo <= 0)
+        {
+            Debug.LogError("FeverCombo 값이 유효하지 않습니다: " + gameData.FeverCombo);
+            return null;
+        }
         return gameData;
     }
     
@@ -162,10 +174,13 @@ public class LocalDataManager : ManagerBase
         Debug.LogError("히스토리 데이터 로드 실패");
         #elif UNITY_ANDROID || UNITY_WEBGL
         gameData = new GameData();
-        gameData.TimeLimit = 60;
+        gameData.TimeLimit = 60.0f;
         gameData.PointApple = 10;
         gameData.PointGoldApple = 20;
         gameData.PointRottenApple = 50;
+        gameData.PointRainbowApple = 50;
+        gameData.FeverTimeLimit = 5.0f;
+        gameData.FeverCombo = 50;
         #endif
     }
     #endregion

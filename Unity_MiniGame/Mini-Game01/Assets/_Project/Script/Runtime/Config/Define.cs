@@ -3,6 +3,7 @@ public enum NoteType
     Apple,
     GoldApple,
     RottenApple,
+    RainbowApple,
 }
 
 public enum InputType

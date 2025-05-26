@@ -11,6 +11,7 @@ public class GameSceneUI : MonoBehaviour
     [FormerlySerializedAs("Timer")] [SerializeField] private GameObject timer; // 타이머 UI 오브젝트
     [FormerlySerializedAs("Score")] [SerializeField] private GameObject score; // 점수 UI 오브젝트
     [FormerlySerializedAs("Combo")] [SerializeField] private GameObject combo; // 콤보 UI 오브젝트
+    [SerializeField] private GameObject fever; // 피버 UI 오브젝트
     
     [Header("Popup Prefabs")]
     [SerializeField] private GameObject pausePopupPrefab; // 일시정지 팝업
@@ -163,5 +164,15 @@ public class GameSceneUI : MonoBehaviour
                 Debug.LogError($"{nameof(pausePopupPrefab)} is null");
         }
         _pausePopup.SetActive(b);
+    }
+
+    public bool IsFeverOn()
+    {
+        return fever.GetComponent<FeverSystem>().IsFever();
+    }
+
+    public void StartFever(float feverTime)
+    {
+        fever.GetComponent<FeverSystem>().StartFever(feverTime);
     }
 }
