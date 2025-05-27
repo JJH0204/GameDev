@@ -3,7 +3,7 @@
 
 # 신규 기능
 - [x] 배경 음악 추가
-- [ ] 게임 다시 시작 시 TitleInit에서 BGM 객체를 중복 생성하는 문제 발생
+- [x] 게임 다시 시작 시 TitleInit에서 BGM 객체를 중복 생성하는 문제 발생
 - [ ] 효과음 추가
 - [x] 연출 추가
 - [x] 연속 콤보(피버) 기능 추가
@@ -18,6 +18,9 @@
 
 # Title Scene
 - [ ] Setting 팝업 추가
+
+# GameOver Popup
+- [x] Popup UI 표시 개선
 
 # WebGL
 - [x] WebGL 빌드 최적화

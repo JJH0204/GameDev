@@ -135,10 +135,6 @@ public class GameSceneUI : MonoBehaviour
         }
     }
     
-    
-    
-    #endregion
-
     public bool IsFinished()
     {
         return _countDown.GetComponent<CountDown>().IsFinished();
@@ -175,4 +171,6 @@ public class GameSceneUI : MonoBehaviour
     {
         fever.GetComponent<FeverSystem>().StartFever(feverTime);
     }
+    
+    #endregion
 }

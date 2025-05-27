@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections;
+// using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -54,8 +55,8 @@ public class LocalDataManager : ManagerBase
             return false;
         }
         
-        historyData.BestScore = historyData.BestScore < userData.totalScore ? userData.totalScore : historyData.BestScore;
-        historyData.HighCombo = historyData.HighCombo < userData.currentCombo ? userData.currentCombo : historyData.HighCombo;
+        historyData.BestScore = historyData.BestScore < userData.currentScore ? userData.currentScore : historyData.BestScore;
+        historyData.BestCombo = historyData.BestCombo < userData.currentCombo ? userData.currentCombo : historyData.BestCombo;
         
         const string jsonFilePath = Config.GameDataPath + "HistoryData.json";
         
@@ -64,7 +65,7 @@ public class LocalDataManager : ManagerBase
         {
             File.WriteAllText(jsonFilePath, jsonData);
             // Debug.Log("HistoryData 저장 완료: " + jsonFilePath);
-            // UnityEditor.AssetDatabase.Refresh(); // TODO: 빌드 할때 에러가 발생한다.
+            // AssetDatabase.Refresh(); // TODO: 빌드 할때 에러가 발생한다.
         }
         catch (Exception e)
         {

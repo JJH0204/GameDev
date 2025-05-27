@@ -119,6 +119,10 @@ public class GameManager : ManagerBase
 
                 break;
             case GameState.GameOver:
+                
+                // 게임 종료 시 최고 점수, 최고 콤보 갱신
+                UpdateHighestUserData();
+
                 // 게임 오버 팝업의 버튼 클릭에 따라 씬 전환 처리
                 // _gameSceneUI.SetEndingPopup(true, _userData, CleanUp(), () => { }, Application.Quit);
                 _gameSceneUI.SetEndingPopup(true, _userData);
@@ -135,6 +139,15 @@ public class GameManager : ManagerBase
                 break;
         }
         return newState;
+    }
+
+    private void UpdateHighestUserData()
+    {
+        if (_userData.bestCombo < _userData.highCombo)
+            _userData.bestCombo = _userData.highCombo;
+
+        if (_userData.bestScore < _userData.currentScore)
+            _userData.bestScore = _userData.currentScore;
     }
 
     private bool CanFever()
@@ -202,7 +215,7 @@ public class GameManager : ManagerBase
 
     private void SetScoreComboUI(UserData userData)
     {
-        _gameSceneUI.SetScore(userData.totalScore);
+        _gameSceneUI.SetScore(userData.currentScore);
         _gameSceneUI.SetCombo(userData.currentCombo);
     }
 
@@ -229,32 +242,32 @@ public class GameManager : ManagerBase
                 // 입력 처리
                 // Debug.Log("Have 버튼 클릭됨");
                 case InputType.Catch when _noteGroupScript.GetNoteType(0) == NoteType.Apple:
-                    _userData.totalScore += LocalDataManager.instance.gameData.PointApple;
+                    _userData.currentScore += LocalDataManager.instance.gameData.PointApple;
                     _userData.currentCombo++;
                     isSuccess = true;
                     break;
                 case InputType.Catch when _noteGroupScript.GetNoteType(0) == NoteType.GoldApple:
-                    _userData.totalScore += LocalDataManager.instance.gameData.PointGoldApple;
+                    _userData.currentScore += LocalDataManager.instance.gameData.PointGoldApple;
                     _userData.currentCombo++;
                     isSuccess = true;
                     break;
                 case InputType.Catch when _noteGroupScript.GetNoteType(0) == NoteType.RainbowApple:
-                    _userData.totalScore += LocalDataManager.instance.gameData.PointRainbowApple;
+                    _userData.currentScore += LocalDataManager.instance.gameData.PointRainbowApple;
                     isSuccess = true;
                     break;
                 case InputType.Catch:
-                    _userData.totalScore -= LocalDataManager.instance.gameData.PointRottenApple;
+                    _userData.currentScore -= LocalDataManager.instance.gameData.PointRottenApple;
                     _userData.currentCombo = 0;
                     _saveCombo = 0;
                     isSuccess = false;
                     break;
                 // Debug.Log("Throw 버튼 클릭됨");
                 case InputType.Throw when _noteGroupScript.GetNoteType(0) == NoteType.RainbowApple:
-                    _userData.totalScore += LocalDataManager.instance.gameData.PointRainbowApple;
+                    _userData.currentScore += LocalDataManager.instance.gameData.PointRainbowApple;
                     isSuccess = true;
                     break;
                 case InputType.Throw when _noteGroupScript.GetNoteType(0) != NoteType.RottenApple:
-                    _userData.totalScore -= LocalDataManager.instance.gameData.PointRottenApple;
+                    _userData.currentScore -= LocalDataManager.instance.gameData.PointRottenApple;
                     _userData.currentCombo = 0;
                     _saveCombo = 0;
                     isSuccess = false;
@@ -265,8 +278,13 @@ public class GameManager : ManagerBase
                     break;
                 
             }
+
+            // _userData의 콤보를 갱신
+            if (_userData.highCombo < _userData.currentCombo)
+                _userData.highCombo = _userData.currentCombo;
+            
             _noteGroupScript.NoteProcess(inputType, isSuccess);
-            _gameSceneUI.SetScore(_userData.totalScore);
+            _gameSceneUI.SetScore(_userData.currentScore);
             _gameSceneUI.SetCombo(_userData.currentCombo);
         }
         catch (Exception e)

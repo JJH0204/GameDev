@@ -1,14 +1,16 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class EndingPopup : MonoBehaviour
 {
     #region SerializeField
+    
     [Header("TMP Text")]
-    [SerializeField] private TextMeshProUGUI totalScoreTMP;
+    [FormerlySerializedAs("totalScoreTMP")] [SerializeField] private TextMeshProUGUI currentScoreTMP;
     [SerializeField] private TextMeshProUGUI bestScoreTMP;
-    [SerializeField] private TextMeshProUGUI currentComboTMP;
-    [SerializeField] private TextMeshProUGUI highComboTMP;
+    [FormerlySerializedAs("currentComboTMP")] [SerializeField] private TextMeshProUGUI highComboTMP;
+    [FormerlySerializedAs("highComboTMP")] [SerializeField] private TextMeshProUGUI bestComboTMP;
     
     [Header("Button")]
     [SerializeField] private GameObject restartButton;
@@ -18,10 +20,10 @@ public class EndingPopup : MonoBehaviour
     
     #region Variables
 
-    private int _totalScore;
+    private int _currentScore;
     private int _bestScore;
-    private int _currentCombo;
     private int _highCombo;
+    private int _bestCombo;
 
     #endregion
 
@@ -41,7 +43,7 @@ public class EndingPopup : MonoBehaviour
 
     private bool CheckSerializedField()
     {
-        if (totalScoreTMP is null || bestScoreTMP is null || currentComboTMP is null || highComboTMP is null)
+        if (currentScoreTMP is null || bestScoreTMP is null || highComboTMP is null || bestComboTMP is null)
         {
             Debug.LogError("TMP Text is null");
             return false;
@@ -86,15 +88,15 @@ public class EndingPopup : MonoBehaviour
 
     public void SetUserData(UserData userData)
     {
-        this._bestScore = userData.bestScore;
-        this._highCombo = userData.highCombo;
-        this._currentCombo = userData.currentCombo;
-        this._totalScore = userData.totalScore;
+        _bestScore = userData.bestScore;
+        _bestCombo = userData.bestCombo;
+        _highCombo = userData.highCombo;
+        _currentScore = userData.currentScore;
         
         bestScoreTMP.text = _bestScore.ToString();
+        bestComboTMP.text = _bestCombo.ToString();
         highComboTMP.text = _highCombo.ToString();
-        currentComboTMP.text = _currentCombo.ToString();
-        totalScoreTMP.text = _totalScore.ToString();
+        currentScoreTMP.text = _currentScore.ToString();
     }
 
     #endregion

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3402648792765668705}
   - component: {fileID: 2477550577202844653}
   m_Layer: 5
-  m_Name: TotalScore
+  m_Name: CurrentScore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -227,10 +227,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef53cbda6885d4b149be1a3a98281802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalScoreTMP: {fileID: 2477550577202844653}
+  currentScoreTMP: {fileID: 2477550577202844653}
   bestScoreTMP: {fileID: 8400560959470084535}
-  currentComboTMP: {fileID: 438890469021121750}
-  highComboTMP: {fileID: 7752935342217635785}
+  highComboTMP: {fileID: 438890469021121750}
+  bestComboTMP: {fileID: 7752935342217635785}
   restartButton: {fileID: 5213928767523471593}
   goTitleButton: {fileID: 4094369507543875752}
   exitButton: {fileID: 7891790788346644784}
@@ -403,7 +403,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5065812, y: 0.6018382}
   m_AnchorMax: {x: 1, y: 0.8018382}
   m_AnchoredPosition: {x: 0.5, y: 1.5}
-  m_SizeDelta: {x: 0, y: -1}
+  m_SizeDelta: {x: -0.000015258789, y: -1.0000038}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1151306997327823007
 CanvasRenderer:
@@ -1182,7 +1182,7 @@ GameObject:
   - component: {fileID: 8640453563593657609}
   - component: {fileID: 7752935342217635785}
   m_Layer: 5
-  m_Name: HighCombo
+  m_Name: BestCombo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1600,11 +1600,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7361502659199501544}
+  - {fileID: 448527369566249329}
   - {fileID: 5521907528565972212}
   - {fileID: 714254589202002550}
   - {fileID: 2264923318029788312}
   - {fileID: 5484604100578345934}
-  - {fileID: 448527369566249329}
   - {fileID: 34992590212424224}
   - {fileID: 6695008385432207256}
   m_Father: {fileID: 9148026637953897884}
@@ -1894,7 +1894,7 @@ GameObject:
   - component: {fileID: 2911001857995752780}
   - component: {fileID: 438890469021121750}
   m_Layer: 5
-  m_Name: CurrentCombo
+  m_Name: HighCombo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

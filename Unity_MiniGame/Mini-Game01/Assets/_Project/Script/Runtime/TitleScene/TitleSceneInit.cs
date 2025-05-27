@@ -24,6 +24,13 @@ public class TitleSceneInit : MonoBehaviour
     private void Start()
     {
         if (!_isInit) return;
+        
+        // BGM 인스턴스가 없다면 생성
+        if (_bgmInstance is not null) return;
+        var obj = FindAnyObjectByType<BGMScript>();
+        if (obj is not null)
+            _bgmInstance = obj.gameObject;
+        if (_bgmInstance is not null) return;
         _bgmInstance = Instantiate(bgmPrefab);
     }
     
