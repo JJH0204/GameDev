@@ -6,9 +6,10 @@ using UnityEngine.Serialization;
 public class NoteScript : MonoBehaviour
 {
     #region Variables
-    [SerializeField] private List<Sprite> noteSpriteList; // 노트 스프라이트 리스트
-    [SerializeField] private List<Sprite> noteDestroyEffectList; // 노트 파괴 이펙트 스프라이트 리스트
-    [SerializeField] private GameObject childObj; // Note의 자식 오브젝트
+    [SerializeField] private List<Sprite> noteSpriteList;           // 노트 스프라이트 리스트
+    [SerializeField] private List<Sprite> noteDestroyEffectList;    // 노트 파괴 이펙트 스프라이트 리스트
+    [SerializeField] private List<AudioClip> noteAudioClipList;
+    [SerializeField] private GameObject childObj;                   // Note의 자식 오브젝트
     // [SerializeField] private List<Sprite> noteDestroyEffectList; // 노트 파괴 이펙트 스프라이트 리스트
     private NoteType _noteType;    // Note의 타입
     #endregion
@@ -68,10 +69,24 @@ public class NoteScript : MonoBehaviour
             {
                 Debug.LogError($"Unknown NoteType: {_noteType}");
             }
+            
+            var audioSource = GetComponent<AudioSource>();
+            if (audioSource is not null)
+            {
+                audioSource.clip = noteAudioClipList[0];
+                audioSource.Play();
+            }
         }
         else
         {
             childObj.GetComponent<SpriteRenderer>().sprite = noteDestroyEffectList[2];
+            
+            var audioSource = GetComponent<AudioSource>();
+            if (audioSource is not null)
+            {
+                audioSource.clip = noteAudioClipList[1];
+                audioSource.Play();
+            }
         }
 
         StartCoroutine(WaitDestroy());

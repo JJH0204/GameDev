@@ -129,7 +129,7 @@ public class GameManager : ManagerBase
                 
                 // TODO: 게임 진행 결과 히스토리 저장
                 if (!_saveHistoryDataJsonFile)
-                    _saveHistoryDataJsonFile = LocalDataManager.instance.SaveHistoryDataJsonFile(_userData); 
+                    _saveHistoryDataJsonFile = LocalDataManager.instance.SaveHistoryData(_userData); 
                 // TODO: 다시하기 버튼 클릭 시 _saveHistoryDataJsonFile = false; 실행
                 
                 break;

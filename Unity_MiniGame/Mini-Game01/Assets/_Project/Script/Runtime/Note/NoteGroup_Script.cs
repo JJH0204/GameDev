@@ -54,9 +54,9 @@ public class NoteGroupScript : MonoBehaviour
         // 첫 번째 노트를 리스트에서 제거
         _noteList.RemoveAt(0);
         
-        // Layer를 최상단으로 변경
+        // (Layer를 최상단으로 변경) > 기존 노트를 가리는 문제로 인해 새로운 레이어 사용
         var childObj = noteObj.transform.GetChild(0);
-        childObj.GetComponent<SpriteRenderer>().sortingLayerName = "DestroyEffect";
+        childObj.GetComponent<SpriteRenderer>().sortingLayerName = "DestroyLayer";
         
         // 새로운 노트 오브젝트 생성
         var gNoteObj = GameObject.Instantiate(gNotePrefab);

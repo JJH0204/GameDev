@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections;
-// using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -14,21 +14,22 @@ public class LocalDataManager : ManagerBase
 
     #region Custom Methods
 
-    private HistoryData LoadHistoryDataJsonFile()
+#if UNITY_EDITOR
+    private HistoryData LoadHistoryData()
     {
         if (string.IsNullOrEmpty(Config.GameDataPath))
         {
             Debug.LogError("게임 데이터 경로가 설정되지 않았습니다.");
             return null;
         }
-
+    
         var jsonFilePath = Config.GameDataPath + "HistoryData.json";
         if (!File.Exists(jsonFilePath))
         {
             Debug.LogError("게임 데이터 파일이 존재하지 않습니다: " + jsonFilePath);
             return null;
         }
-
+    
         var jsonData = File.ReadAllText(jsonFilePath);
         
         try
@@ -40,13 +41,13 @@ public class LocalDataManager : ManagerBase
             Debug.LogError("JSON 파싱 중 오류 발생: " + e.Message);
             return null;
         }
-
+    
         if (historyData is not null) return historyData;
         Debug.LogError("게임 데이터 파싱에 실패했습니다. JSON 구조를 확인하세요.");
         return null;
     }
     // TODO: 점수 저장 메서드 구현
-    public bool SaveHistoryDataJsonFile(UserData userData)
+    public bool SaveHistoryData(UserData userData)
     {
         // 지정된 경로에 HistoryData 객체를 JSON 형식으로 저장합니다.
         if (string.IsNullOrEmpty(Config.GameDataPath))
@@ -74,21 +75,21 @@ public class LocalDataManager : ManagerBase
         }
         return true;
     }
-    private GameData LoadGameDataJsonFile()
+    private GameData LoadGameData()
     {
         if (string.IsNullOrEmpty(Config.GameDataPath))
         {
             Debug.LogError("게임 데이터 경로가 설정되지 않았습니다.");
             return null;
         }
-
+    
         const string jsonFilePath = Config.GameDataPath + "GameData.json";
         if (!File.Exists(jsonFilePath))
         {
             Debug.LogError("게임 데이터 파일이 존재하지 않습니다: " + jsonFilePath);
             return null;
         }
-
+    
         var jsonData = File.ReadAllText(jsonFilePath);
         
         try
@@ -100,13 +101,13 @@ public class LocalDataManager : ManagerBase
             Debug.LogError("JSON 파싱 중 오류 발생: " + e.Message);
             return null;
         }
-
+    
         if (gameData == null)
         {
             Debug.LogError("게임 데이터 파싱에 실패했습니다. JSON 구조를 확인하세요.");
             return null;
         }
-
+    
         if (gameData.TimeLimit <= 0)
         {
             Debug.LogError("TimeLimit 값이 유효하지 않습니다: " + gameData.TimeLimit);
@@ -126,6 +127,173 @@ public class LocalDataManager : ManagerBase
         }
         return gameData;
     }
+    
+#elif UNITY_WEBGL
+    
+#else
+    private string GetSavePath(string fileName)
+    {
+        return Path.Combine(Application.persistentDataPath, fileName);
+    }
+    
+    private bool CreateSaveDirectory()
+    {
+        try
+        {
+            if (!Directory.Exists(Application.persistentDataPath))
+            {
+                Directory.CreateDirectory(Application.persistentDataPath);
+                Debug.Log($"저장 디렉토리 생성 완료: {Application.persistentDataPath}");
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"저장 디렉토리 생성 중 오류 발생: {e.Message}");
+            return false;
+        }
+    }
+
+    private bool CreateGameDataFile()
+    {
+        try
+        {
+            var path = GetSavePath("GameData.json");
+            if (!File.Exists(path))
+            {
+                var defaultData = new GameData();
+                
+                defaultData.TimeLimit = 60.0f;
+                defaultData.PointApple = 10;
+                defaultData.PointGoldApple = 20;
+                defaultData.PointRottenApple = 50;
+                defaultData.PointRainbowApple = 50;
+                defaultData.FeverTimeLimit = 5.0f;
+                defaultData.FeverCombo = 50;
+
+                var json = JsonUtility.ToJson(defaultData, true);
+                File.WriteAllText(path, json);
+                Debug.Log($"GameData 파일 생성 완료: {path}");
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"GameData 파일 생성 중 오류 발생: {e.Message}");
+            return false;
+        }
+    }
+
+    private bool CreateHistoryDataFile()
+    {
+        try
+        {
+            var path = GetSavePath("HistoryData.json");
+            if (!File.Exists(path))
+            {
+                var defaultData = new HistoryData();
+                defaultData.BestScore = 0;
+                defaultData.BestCombo = 0;
+
+                var json = JsonUtility.ToJson(defaultData, true);
+                File.WriteAllText(path, json);
+                Debug.Log($"HistoryData 파일 생성 완료: {path}");
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"HistoryData 파일 생성 중 오류 발생: {e.Message}");
+            return false;
+        }
+    }
+
+    private bool IsSaveDirectoryExists()
+    {
+        try
+        {
+            if (Directory.Exists(Application.persistentDataPath))
+            {
+                Debug.Log($"저장 디렉토리 확인 완료: {Application.persistentDataPath}");
+                return true;
+            }
+            else
+            {
+                Debug.LogWarning($"저장 디렉토리가 존재하지 않습니다: {Application.persistentDataPath}");
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"저장 디렉토리 확인 중 오류 발생: {e.Message}");
+            return false;
+        }
+    }
+
+    public bool SaveHistoryData(UserData userData)
+    {
+        try
+        {
+            var path = GetSavePath("HistoryData.json");
+        
+            historyData.BestScore = historyData.BestScore < userData.currentScore ? userData.currentScore : historyData.BestScore;
+            historyData.BestCombo = historyData.BestCombo < userData.currentCombo ? userData.currentCombo : historyData.BestCombo;
+        
+            var json = JsonUtility.ToJson(historyData, true);
+            File.WriteAllText(path, json);
+            Debug.Log(json);
+            Debug.Log($"HistoryData 저장 완료: {path}");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"HistoryData 저장 중 오류 발생: {e.Message}");
+            return false;
+        }
+    }
+
+    public HistoryData LoadHistoryData()
+    {
+        var path = GetSavePath("HistoryData.json");
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"UserData 파일이 존재하지 않습니다: {path}");
+            return null;
+        }
+
+        var json = File.ReadAllText(path);
+        try
+        {
+            return JsonUtility.FromJson<HistoryData>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"UserData JSON 파싱 오류: {e.Message}");
+            return null;
+        }
+    }
+    
+    public GameData LoadGameData()
+    {
+        var path = GetSavePath("GameData.json");
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"GameData 파일이 존재하지 않습니다: {path}");
+            return null;
+        }
+
+        var json = File.ReadAllText(path);
+        try
+        {
+            return JsonUtility.FromJson<GameData>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"GameData JSON 파싱 오류: {e.Message}");
+            return null;
+        }
+    }
+#endif
     
     #endregion
 
@@ -149,20 +317,29 @@ public class LocalDataManager : ManagerBase
     private void Awake()
     {
         DontDestroy<LocalDataManager>();
+#if UNITY_EDITOR
+        
+#else
+        // 저장 디렉토리 확인 및 생성
+        if (!IsSaveDirectoryExists())
+        {
+            if (!CreateSaveDirectory())
+            {
+                Debug.LogError("저장 디렉토리 생성 실패");
+                return;
+            }
+            
+            CreateGameDataFile();
+            CreateHistoryDataFile();
+        }
+#endif
     }
     
     private void Start()
     {
+#if UNITY_EDITOR
         // 게임 데이터 로드
-        // StartCoroutine(LoadGameData(result =>
-        // {
-        //     if (result == null) return;
-        //     Debug.Log("GameData 로드 완료!");
-        //     gameData = result;
-        // }));
-        #if UNITY_EDITOR
-        // 게임 데이터 로드
-        gameData = LoadGameDataJsonFile();
+        gameData = LoadGameData();
         if (gameData is null)
         {
             Debug.LogError("게임 데이터 로드 실패");
@@ -170,10 +347,11 @@ public class LocalDataManager : ManagerBase
         }
         
         // 히스토리 데이터 로드
-        historyData = LoadHistoryDataJsonFile();
+        historyData = LoadHistoryData();
         if (historyData is not null) return;
         Debug.LogError("히스토리 데이터 로드 실패");
-        #elif UNITY_ANDROID || UNITY_WEBGL
+
+#elif UNITY_WEBGL
         gameData = new GameData();
         gameData.TimeLimit = 60.0f;
         gameData.PointApple = 10;
@@ -182,7 +360,21 @@ public class LocalDataManager : ManagerBase
         gameData.PointRainbowApple = 50;
         gameData.FeverTimeLimit = 5.0f;
         gameData.FeverCombo = 50;
-        #endif
+
+#else
+        gameData = LoadGameData();
+        if (gameData is null)
+        {
+            Debug.LogError("게임 데이터 로드 실패");
+            return;
+        }
+        
+        // 히스토리 데이터 로드
+        historyData = LoadHistoryData();
+        if (historyData is not null) return;
+        Debug.LogError("히스토리 데이터 로드 실패");
+
+#endif
     }
     #endregion
     
