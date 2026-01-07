@@ -1,8 +1,9 @@
 {
-    "GameName" : "어서와, 재구네 사과농장",
-    "GameVersion" : "1.0.0",
     "PointApple" : 10,
     "PointGoldApple": 20,
     "PointRottenApple": 50,
-    "TimeLimit" : 60.0
+    "PointRainbowApple": 50,
+    "TimeLimit" : 60.0,
+    "FeverTimeLimit" : 5.0,
+    "FeverCombo" : 50
 }

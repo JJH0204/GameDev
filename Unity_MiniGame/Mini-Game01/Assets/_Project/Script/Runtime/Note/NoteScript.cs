@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -5,8 +6,11 @@ using UnityEngine.Serialization;
 public class NoteScript : MonoBehaviour
 {
     #region Variables
-    [FormerlySerializedAs("NoteSpriteList")] [SerializeField] private List<Sprite> noteSpriteList; // 노트 스프라이트 리스트
-    [FormerlySerializedAs("ChildObj")] [SerializeField] private GameObject childObj; // Note의 자식 오브젝트
+    [SerializeField] private List<Sprite> noteSpriteList;           // 노트 스프라이트 리스트
+    [SerializeField] private List<Sprite> noteDestroyEffectList;    // 노트 파괴 이펙트 스프라이트 리스트
+    [SerializeField] private List<AudioClip> noteAudioClipList;
+    [SerializeField] private GameObject childObj;                   // Note의 자식 오브젝트
+    // [SerializeField] private List<Sprite> noteDestroyEffectList; // 노트 파괴 이펙트 스프라이트 리스트
     private NoteType _noteType;    // Note의 타입
     #endregion
     #region Unity Methods
@@ -36,7 +40,7 @@ public class NoteScript : MonoBehaviour
     }
 
     // 노트의 타입을 설정하는 메서드
-    private void SetNoteType(NoteType type)
+    public void SetNoteType(NoteType type)
     {
         this._noteType = type;
         childObj.GetComponent<SpriteRenderer>().sprite = noteSpriteList[(int)type];
@@ -48,4 +52,49 @@ public class NoteScript : MonoBehaviour
         return _noteType;
     }
     #endregion
+
+    public void DstroyNote(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            if (_noteType == NoteType.RottenApple || _noteType == NoteType.Apple)
+            {
+                childObj.GetComponent<SpriteRenderer>().sprite = noteDestroyEffectList[0];
+            }
+            else if (_noteType == NoteType.GoldApple || _noteType == NoteType.RainbowApple)
+            {
+                childObj.GetComponent<SpriteRenderer>().sprite = noteDestroyEffectList[1];
+            }
+            else
+            {
+                Debug.LogError($"Unknown NoteType: {_noteType}");
+            }
+            
+            var audioSource = GetComponent<AudioSource>();
+            if (audioSource is not null)
+            {
+                audioSource.clip = noteAudioClipList[0];
+                audioSource.Play();
+            }
+        }
+        else
+        {
+            childObj.GetComponent<SpriteRenderer>().sprite = noteDestroyEffectList[2];
+            
+            var audioSource = GetComponent<AudioSource>();
+            if (audioSource is not null)
+            {
+                audioSource.clip = noteAudioClipList[1];
+                audioSource.Play();
+            }
+        }
+
+        StartCoroutine(WaitDestroy());
+    }
+
+    private IEnumerator WaitDestroy()
+    {
+        yield return new WaitForSeconds(0.3f);
+        Destroy(gameObject);
+    }
 }

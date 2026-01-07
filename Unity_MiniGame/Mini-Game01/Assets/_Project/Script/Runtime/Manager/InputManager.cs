@@ -1,28 +1,7 @@
 using UnityEngine;
 
-public class InputManager : ManagerBase
+public class InputManager : ManagerBase<InputManager>
 {
-    #region Singleton
-    private static InputManager _instance;
-
-    public static InputManager instance
-    {
-        get
-        {
-            if (_instance is null)
-            {
-                _instance = FindObjectOfType<InputManager>();
-                if (_instance is null)
-                {
-                    GameObject obj = new GameObject("InputManager");
-                    _instance = obj.AddComponent<InputManager>();
-                }
-            }
-            return _instance;
-        }
-    }
-    #endregion
-
     #region Cache
     
     private GameSceneUI _gameSceneUI;
@@ -30,10 +9,6 @@ public class InputManager : ManagerBase
     #endregion
 
     #region Unity Methods
-    void Awake()
-    {
-        DontDestroy<InputManager>();
-    }
 
     void Update()
     { 

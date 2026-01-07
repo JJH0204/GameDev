@@ -959,6 +959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22e59e5ff87d84a4f917798b4f2dce26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bgmPrefab: {fileID: 4283609144629348243, guid: effea8ea86c4648cea3e12b097052bc9, type: 3}
 --- !u!4 &1733773443
 Transform:
   m_ObjectHideFlags: 0
