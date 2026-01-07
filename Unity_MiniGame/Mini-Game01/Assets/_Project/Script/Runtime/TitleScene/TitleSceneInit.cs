@@ -39,7 +39,7 @@ public class TitleSceneInit : MonoBehaviour
     #region Methods
     private static bool CheckInit()
     {
-        var managers = FindObjectsByType<ManagerBase>(FindObjectsSortMode.None);
+        var managers = FindObjectsByType<ManagerBase<>>(FindObjectsSortMode.None);
         if (managers.Length >= 1) return true;
         // 생성되된 매니저가 없다면 Init씬으로 이동
         SceneLoadManager.instance.LoadScene(SceneType.Init);

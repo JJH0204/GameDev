@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class LocalDataManager : ManagerBase
+public class LocalDataManager : ManagerBase<LocalDataManager>
 {
     #region Variables
     public GameData gameData { get; private set; }
@@ -297,26 +297,9 @@ public class LocalDataManager : ManagerBase
     
     #endregion
 
-    #region Singleton
-    private static LocalDataManager _instance;
-    public static LocalDataManager instance
-    {
-        get
-        {
-            if (_instance is not null) return _instance;
-            _instance = FindObjectOfType<LocalDataManager>(); 
-            if (_instance is not null) return _instance;
-            var obj = new GameObject("LocalDataManager");
-            _instance = obj.AddComponent<LocalDataManager>();
-            return _instance;
-        }
-    }
-    #endregion
-
     #region Unity Methods
     private void Awake()
     {
-        DontDestroy<LocalDataManager>();
 #if UNITY_EDITOR
         
 #else

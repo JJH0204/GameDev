@@ -1,18 +1,27 @@
 using UnityEngine;
 
-public abstract class ManagerBase : MonoBehaviour
+public abstract class ManagerBase<T> : MonoBehaviour where T : ManagerBase<T>
 {
-    #region Shared Methods
-    
-    protected void DontDestroy<T>() where T : Object
-    {
-        T[] managers = FindObjectsByType<T>(FindObjectsSortMode.None);
+    #region Singleton
 
-        if (managers.Length > 1)
-            Destroy(gameObject);
-        else
-            DontDestroyOnLoad(gameObject);
+    private static T _instance;
+    public static T instance
+    {
+        get
+        {
+            if (_instance is not null) return _instance;
+            _instance = FindObjectOfType<T>();
+            if (_instance is not null) return _instance;
+            var obj = new GameObject(typeof(T).Name);
+            _instance = obj.AddComponent<T>();
+            DontDestroyOnLoad(obj);
+            return _instance;
+        }
     }
+    
+    #endregion
+    
+    #region Shared Methods
 
     public bool IsInstance()
     {

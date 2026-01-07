@@ -1,28 +1,8 @@
 using System;
 using System.Collections;
 using UnityEngine;
-public class GameManager : ManagerBase
+public class GameManager : ManagerBase<GameManager>
 {
-    #region Singleton
-    private static GameManager _instance;
-    public static GameManager instance
-    {
-        get
-        {
-            if (_instance is null)
-            {
-                _instance = FindObjectOfType<GameManager>();
-                if (_instance is null)
-                {
-                    GameObject obj = new GameObject("GameManager");
-                    _instance = obj.AddComponent<GameManager>();
-                }
-            }
-            return _instance;
-        }
-    }
-    #endregion
-
     #region Variables
 
     private float _time;
@@ -46,7 +26,7 @@ public class GameManager : ManagerBase
     #region Unity Methods
     private void Awake()
     {
-        DontDestroy<GameManager>();
+        // DontDestroy<GameManager>();
         _userData = new UserData();
     }
 

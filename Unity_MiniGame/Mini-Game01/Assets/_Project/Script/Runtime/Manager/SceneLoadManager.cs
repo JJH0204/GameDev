@@ -2,39 +2,14 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneLoadManager : ManagerBase
+public class SceneLoadManager : ManagerBase<SceneLoadManager>
 {
-    #region Singleton
-
-    private static SceneLoadManager _instance;
-    public static SceneLoadManager instance
-    {
-        get
-        {
-            if (_instance is null)
-            {
-                _instance = FindObjectOfType<SceneLoadManager>();
-                if (_instance is null)
-                {
-                    GameObject obj = new GameObject("SceneLoadManager");
-                    _instance = obj.AddComponent<SceneLoadManager>();
-                }
-            }
-            return _instance;
-        }
-    }
-    #endregion
-
     #region Variables
     private SceneType _currentSceneType;
     #endregion
 
     #region Unity Methods
     
-    void Awake()
-    {
-        DontDestroy<SceneLoadManager>();
-    }
     private void Start()
     {
         _currentSceneType = SceneType.None;
