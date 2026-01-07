@@ -25,7 +25,7 @@ obj/
 *.suo
 *.user
 *.userprefs
-# *.csproj
+*.csproj
 *.unityproj
 # *.asset
 *.sln
